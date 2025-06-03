@@ -9,27 +9,32 @@ CORS(app)
 
 DB_FILE = "cuentas.json"
 
-# 📥 Cargar cuentas desde archivo JSON
+# 📥 Leer datos desde JSON
 def cargar_cuentas():
     if os.path.exists(DB_FILE):
         with open(DB_FILE, "r", encoding="utf-8") as f:
             return json.load(f)
     return []
 
-# 💾 Guardar cuentas en archivo JSON
+# 💾 Guardar datos en JSON
 def guardar_cuentas(data):
     with open(DB_FILE, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=2)
 
-# 🔄 Regenerar regalos cada 24h (máximo 5)
+# 🔄 Regenerar regalos individuales por cuenta
 def actualizar_regalos(cuentas):
     tiempo_actual = time.time()
     cambios = False
+
     for cuenta in cuentas:
-        while cuenta["regalos_disponibles"] < 5 and tiempo_actual - cuenta["ultimo_regalo"] >= 86400:
-            cuenta["regalos_disponibles"] += 1
-            cuenta["ultimo_regalo"] += 86400
+        tiempos = cuenta.get("regalos_tiempos", [])
+        # Limpiar tiempos expirados
+        nuevos_tiempos = [t for t in tiempos if t > tiempo_actual - 86400]
+        if len(nuevos_tiempos) < len(tiempos):
             cambios = True
+        cuenta["regalos_tiempos"] = nuevos_tiempos
+        cuenta["regalos_disponibles"] = max(0, 5 - len(nuevos_tiempos))
+
     return cambios
 
 # ✅ Obtener todas las cuentas
@@ -50,37 +55,54 @@ def agregar_cuenta():
         "nombre": data.get("nombre", "SinNombre"),
         "pavos": data.get("pavos", 0),
         "regalos_disponibles": 5,
-        "ultimo_regalo": time.time()
+        "regalos_tiempos": []
     }
     cuentas.append(nueva)
     guardar_cuentas(cuentas)
     return jsonify(nueva), 201
 
-# ✏️ Actualizar cuenta por ID (nombre, pavos, regalos_disponibles, ultimo_regalo)
+# ✏️ Actualizar cuenta
 @app.route("/api/cuentas/<int:id>", methods=["PUT"])
 def actualizar_cuenta(id):
     data = request.json
     cuentas = cargar_cuentas()
+
     for cuenta in cuentas:
         if cuenta["id"] == id:
-            # Solo actualiza los campos válidos
-            for key in ["nombre", "pavos", "regalos_disponibles", "ultimo_regalo"]:
+            # Campos simples
+            for key in ["nombre", "pavos"]:
                 if key in data:
                     cuenta[key] = data[key]
+
+            # Control de regalos
+            if "regalos_disponibles" in data:
+                actual = cuenta.get("regalos_disponibles", 5)
+                nuevo = data["regalos_disponibles"]
+
+                if nuevo < actual:
+                    # Registrar un nuevo envío solo si es decremento
+                    cuenta.setdefault("regalos_tiempos", []).append(time.time())
+                elif nuevo > actual:
+                    # Permitir reinicio manual
+                    cuenta["regalos_tiempos"] = []
+
+                cuenta["regalos_disponibles"] = nuevo
+
             guardar_cuentas(cuentas)
             return jsonify(cuenta)
+
     return jsonify({"error": "Cuenta no encontrada"}), 404
 
-# 🗑️ Eliminar cuenta por ID
+# 🗑️ Eliminar cuenta
 @app.route("/api/cuentas/<int:id>", methods=["DELETE"])
 def eliminar_cuenta(id):
     cuentas = cargar_cuentas()
-    cuentas_filtradas = [c for c in cuentas if c["id"] != id]
-    if len(cuentas_filtradas) != len(cuentas):
-        guardar_cuentas(cuentas_filtradas)
+    nuevas = [c for c in cuentas if c["id"] != id]
+    if len(nuevas) != len(cuentas):
+        guardar_cuentas(nuevas)
         return jsonify({"mensaje": "Cuenta eliminada"}), 200
     return jsonify({"error": "Cuenta no encontrada"}), 404
 
-# 🚀 Ejecutar servidor
+# 🚀 Iniciar servidor
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
