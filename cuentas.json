@@ -1,0 +1,72 @@
+[
+  {
+    "id": 1748905806867,
+    "nombre": "KidStore0001",
+    "pavos": 17600,
+    "regalos_disponibles": 2,
+    "ultimo_regalo": 1748905806.8679492
+  },
+  {
+    "id": 1748905832765,
+    "nombre": "KidStore0002",
+    "pavos": 13800,
+    "regalos_disponibles": 5,
+    "ultimo_regalo": 1748905832.7659256
+  },
+  {
+    "id": 1748905840424,
+    "nombre": "KidStore0003",
+    "pavos": 25100,
+    "regalos_disponibles": 5,
+    "ultimo_regalo": 1748905840.424512
+  },
+  {
+    "id": 1748905851188,
+    "nombre": "KidStore0004",
+    "pavos": 13200,
+    "regalos_disponibles": 5,
+    "ultimo_regalo": 1748905851.1884542
+  },
+  {
+    "id": 1748905877198,
+    "nombre": "KidStore0005",
+    "pavos": 17700,
+    "regalos_disponibles": 5,
+    "ultimo_regalo": 1748905877.1987169
+  },
+  {
+    "id": 1748905887282,
+    "nombre": "KidStore0006",
+    "pavos": 18000,
+    "regalos_disponibles": 5,
+    "ultimo_regalo": 1748905887.2825854
+  },
+  {
+    "id": 1748905899271,
+    "nombre": "KidStore0007",
+    "pavos": 19600,
+    "regalos_disponibles": 0,
+    "ultimo_regalo": 1748905899.2711954
+  },
+  {
+    "id": 1748905931323,
+    "nombre": "KidStore0008",
+    "pavos": 22300,
+    "regalos_disponibles": 5,
+    "ultimo_regalo": 1748905931.323909
+  },
+  {
+    "id": 1748905958315,
+    "nombre": "KidStore0009",
+    "pavos": 18300,
+    "regalos_disponibles": 4,
+    "ultimo_regalo": 1748905958.3150475
+  },
+  {
+    "id": 1748905971514,
+    "nombre": "KidStore0010",
+    "pavos": 100,
+    "regalos_disponibles": 5,
+    "ultimo_regalo": 1748905971.514326
+  }
+]
